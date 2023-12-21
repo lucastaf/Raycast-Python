@@ -25,6 +25,7 @@ while newGame.running:
 
     if newGame.mode == 0:
         map1.draw(newGame.screen)
+        rays.drawRays()
         newGame.drawCharacters()
     else:
         rays.draw3D()

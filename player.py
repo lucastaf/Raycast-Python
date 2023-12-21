@@ -14,7 +14,7 @@ class player:
     def draw(self):
         pg.draw.line(
             self.screen,
-            "yellow",
+            "blue",
             self.position,
             (
                 self.position.x + math.cos(self.angle) * 100,
