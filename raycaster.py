@@ -8,8 +8,12 @@ def drawLineCentered(screen, color, x ,y ,size, width):
     finalY = y - size
     pg.draw.line(screen, color, (x, initY), (x, finalY), width)
 
+def distance(positionA : pg.Vector2, positionB : pg.Vector2):
+    print("a")
+
+
 class raycaster:
-    def __init__(self, character, resolution=2, fov=60, maxDistance=500):
+    def __init__(self, character, resolution=4, fov=60, maxDistance=500):
         self.maxDistance = maxDistance
         self.fov = math.radians(fov)
         self.character = character
@@ -29,13 +33,13 @@ class raycaster:
             for value in range(self.maxDistance):
                 RayPosition = pg.Vector2(
                 self.character.position.x
-                + math.cos(self.raysRadian[ray]) * value,
+                + math.cos(self.raysRadian[ray]) * value * map.squareSize,
                 self.character.position.y
-                + math.sin(self.raysRadian[ray]) * value,)
-                posmapa = map.get_MapPosition(RayPosition)
-                if map.map[int(posmapa.y)][int(posmapa.x)] == 1:
+                + math.sin(self.raysRadian[ray]) * value * map.squareSize,)
+                if map.testColision(RayPosition):
                     self.raysSize[ray] = value
                     break
+        
 
     def drawRays(self):
         for ray in range(self.numberOfRays):

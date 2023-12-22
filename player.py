@@ -31,7 +31,7 @@ class player:
         deslocX = -(x * math.sin(realAngle)) + (y * math.cos(realAngle))
         deslocY = (x * math.cos(realAngle)) + (y * math.sin(realAngle))
         newPosition = pg.Vector2(self.position.x + deslocX, self.position.y + deslocY)
-        if(self.testColisionRect(newPosition,mapa)):
+        if not(mapa.testColision(newPosition)):
             self.position = newPosition
 
         """
@@ -47,12 +47,6 @@ class player:
         if self.angle >= math.pi * 2:
             self.angle -= math.pi * 2
 
-    def testColisionPoint(self, position, mapa):
-        location = mapa.get_MapPosition(position)
-        if mapa.map[int(location.y)][int(location.x)] == 1:
-            return True
-        else:
-            return False
 
     def testColisionRect(self, position, mapa):
         pointUL = pg.Vector2(position.x - self.size/2, position.y - self.size/2)
