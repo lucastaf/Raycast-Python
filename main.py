@@ -11,9 +11,10 @@ pg.init()
 newGame = game()
 map1 = map.map([[1, 1, 1, 1, 1],
                 [1, 0, 0, 0, 1],
-                [1, 1, 0, 0, 1],
+                [1, 0, 1, 0, 1],
                 [1, 0, 0, 0, 1],
-                [1, 1, 1, 1, 1],])
+                [1, 1, 1, 1, 1],],
+                newGame.screen)
 
 rays = raycaster.raycaster(newGame.character)
 
@@ -27,6 +28,7 @@ while newGame.running:
         map1.draw(newGame.screen)
         rays.drawRays()
         newGame.drawCharacters()
+        
     else:
         rays.draw3D()
 
