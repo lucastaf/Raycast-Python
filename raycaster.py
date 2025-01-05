@@ -8,8 +8,14 @@ def drawLineCentered(screen, color, x ,y ,size, width):
     finalY = y - size
     pg.draw.line(screen, color, (x, initY), (x, finalY), width)
 
+def distance(positionA : pg.Vector2, positionB : pg.Vector2):
+    distanceX = positionB.x - positionA.x
+    distanceY = positionA.y - positionB.y
+    return math.sqrt((distanceX ** 2) + (distanceY ** 2))
+
+
 class raycaster:
-    def __init__(self, character, resolution=2, fov=60, maxDistance=500):
+    def __init__(self, character, resolution=4, fov=60, maxDistance=20):
         self.maxDistance = maxDistance
         self.fov = math.radians(fov)
         self.character = character
@@ -26,16 +32,45 @@ class raycaster:
 
     def calculateDistances(self, map):
         for ray in range(self.numberOfRays):
+            sinAngle = math.sin(self.raysRadian[ray])
+            cosAngle = math.cos(self.raysRadian[ray])
+            expandX = expandY = True
+            mapBorderPosition = map.get_MapPosition(self.character.position) * map.squareSize
+            directionX = 1 if cosAngle > 0 else -1
+            directionY = 1 if sinAngle > 0 else -1
+
+            rayPositionX = mapBorderPosition.copy()
+            rayPositionX.x += map.squareSize if cosAngle > 0 else -0.00001
+            rayPositionX.y = self.character.position.y + ((rayPositionX.x - self.character.position.x)/cosAngle * sinAngle) 
+
+            rayPositionY = mapBorderPosition.copy()
+            rayPositionY.y += map.squareSize if sinAngle > 0 else -0.00001
+            rayPositionY.x = self.character.position.x + ((rayPositionY.y - self.character.position.y)/sinAngle * cosAngle) 
+            
+            XAmmount = map.squareSize / sinAngle * cosAngle
+            YAmmount = map.squareSize / cosAngle * sinAngle
             for value in range(self.maxDistance):
-                RayPosition = pg.Vector2(
-                self.character.position.x
-                + math.cos(self.raysRadian[ray]) * value,
-                self.character.position.y
-                + math.sin(self.raysRadian[ray]) * value,)
-                posmapa = map.get_MapPosition(RayPosition)
-                if map.map[int(posmapa.y)][int(posmapa.x)] == 1:
-                    self.raysSize[ray] = value
+                if map.testColision(rayPositionY) and expandY:
+                    distanceY = distance(self.character.position, rayPositionY)
+                    expandY = False
+                if map.testColision(rayPositionX) and expandX:
+                    distanceX = distance(self.character.position, rayPositionX)
+                    expandX = False
+                
+                if expandX:
+                    rayPositionX += (
+                        map.squareSize * directionX,
+                        YAmmount * directionX
+                    )
+                if expandY:
+                    rayPositionY += (
+                        XAmmount * directionY,
+                        map.squareSize * directionY
+                    )
+                if not(expandX or expandY):
                     break
+            rayDistance = distanceX if distanceX < distanceY else distanceY
+            self.raysSize[ray] = rayDistance
 
     def drawRays(self):
         for ray in range(self.numberOfRays):
@@ -46,7 +81,7 @@ class raycaster:
 
     def draw3D(self):
         for ray in range(self.numberOfRays):
-            intense = self.maxDistance/self.raysSize[ray] * 15
+            intense = self.maxDistance/self.raysSize[ray] * 500
             if intense > 255:
                 intense = 255
             if intense < 0:
